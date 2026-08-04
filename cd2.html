@@ -100,6 +100,39 @@ input[type="file"]{display:none}
 
 .reset-row{text-align:center;padding:6px 0 22px}
 
+/* ---------- Safe areas (iPhone notch) ---------- */
+@supports(padding:env(safe-area-inset-top)){
+header.topbar{padding-top:calc(18px + env(safe-area-inset-top))}
+.footer-bar{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+
+/* ---------- Mobile-first responsive ---------- */
+@media(max-width:380px){
+header.topbar{padding:14px 14px 12px}
+.topbar-back{font-size:11px;padding:6px 10px}
+.topbar-icon{width:36px;height:36px;font-size:17px}
+.topbar-text .eyebrow{font-size:10px}
+main{padding:12px 12px 8px}
+.card{padding:14px}
+.tag-label{font-size:11px}
+.tag-label::after{font-size:10px}
+.btn{padding:12px 14px;font-size:13px}
+.btn-row{flex-direction:column;gap:8px}
+.field-row{flex-direction:column;gap:0}
+input[type="text"],input[type="number"]{font-size:16px}
+#sigCanvas{height:160px}
+.footer-bar{padding:10px 12px}
+}
+@media(max-width:350px){
+header.topbar{padding:12px 10px 10px}
+.topbar-back{font-size:10px;padding:5px 8px}
+main{padding:10px}
+.card{padding:12px;border-radius:12px}
+input[type="text"],input[type="number"]{padding:12px;font-size:16px}
+.btn{padding:11px 12px;font-size:12px}
+#sigCanvas{height:140px}
+}
+
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
