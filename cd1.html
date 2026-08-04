@@ -369,31 +369,30 @@ return true
 
 function buildText(){
 const div='━━━━━━━━━━━━━━━'
-const lines=['*🚚 REGISTRO DE PROVA*','_CD1 · Perecíveis_','']
-blocksContainer.querySelectorAll('.block').forEach(function(b,i){
+const now=new Date()
+const horas=String(now.getHours()).padStart(2,'0')
+const minutos=String(now.getMinutes()).padStart(2,'0')
+const conferente=sessionStorage.getItem('nagumoAuthNome')||''
+const lines=['*🚚 CARREGAMENTO CD1 PERECÍVEIS*','CONFERENTE: '+conferente,'Horário: '+horas+':'+minutos,'']
+const blocks=blocksContainer.querySelectorAll('.block')
+blocks.forEach(function(b,i){
 const store=b.querySelector('.store').value.trim()
 const dock=b.querySelector('.dock').value.trim()
 const pallets=b.querySelector('.pallets').value.trim()
-const rota=b.querySelector('.rota').value.trim()
 lines.push(div)
-lines.push('*Carga '+String(i+1).padStart(2,'0')+'*')
+if(i>0)lines.push('*COMPLEMENTO*')
 lines.push('📍 Loja: '+(store||'-'))
 lines.push('🚪 Doca: '+(dock||'-'))
 lines.push('📦 Paletes: '+(pallets||'-'))
-lines.push('🚩 Rota: '+(rota||'-'))
 lines.push('📎 '+b.files.length+' mídia(s) anexada(s)')
 })
 lines.push(div)
 lines.push('')
 const placa=placaInput.value.trim()
 const motorista=motoristaInput.value.trim()
-lines.push('*Dados do veículo*')
+lines.push('*DADOS DO VEÍCULO*')
 lines.push('🚙 Placa: '+(placa||'-'))
 lines.push('👤 Motorista: '+(motorista||'-'))
-lines.push('')
-lines.push('✍️ Assinatura digital: incluída ✅')
-const enviadoPor=sessionStorage.getItem('nagumoAuthNome')||''
-if(enviadoPor)lines.push('👤 Enviado por: '+enviadoPor)
 return lines.join('\n')
 }
 
