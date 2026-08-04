@@ -416,9 +416,42 @@ const files=[]
 blocksContainer.querySelectorAll('.block').forEach(function(b){files.push.apply(files,b.files)})
 const text=buildText()
 
+function saveHistorico(){
+const now=new Date()
+const ts=now.toLocaleDateString('pt-BR')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')
+const conferente=sessionStorage.getItem('nagumoAuthNome')||''
+const blocks=blocksContainer.querySelectorAll('.block')
+const cargas=[]
+blocks.forEach(function(b,i){
+const loja=b.querySelector('.store').value.trim()||'-'
+const doca=b.querySelector('.dock').value.trim()||'-'
+const paletes=b.querySelector('.pallets').value.trim()||'-'
+const rota=b.querySelector('.rota').value.trim()||'-'
+cargas.push({loja:loja,doca:doca,paletes:paletes,rota:rota,midias:b.files.length})
+})
+const entry={
+id:Date.now(),
+tipo:'CD1 Perecíveis',
+titulo:'🧊 CD1 Perecíveis',
+data:ts,
+conferente:conferente,
+placa:placaInput.value.trim()||'-',
+motorista:motoristaInput.value.trim()||'-',
+cargas:cargas,
+texto:text
+}
+try{
+var arr=JSON.parse(localStorage.getItem('nagumoHistorico')||'[]')
+arr.unshift(entry)
+if(arr.length>100)arr=arr.slice(0,100)
+localStorage.setItem('nagumoHistorico',JSON.stringify(arr))
+}catch(e){}
+}
+
 if(navigator.share){
 try{
 await navigator.share({title:'Registro de Prova',text:text,files:files})
+saveHistorico()
 statusEl.textContent='✅ Enviado com sucesso!'
 statusEl.className='ok'
 shareBtn.disabled=false
@@ -435,6 +468,7 @@ statusEl.className='err'
 }
 }
 
+saveHistorico()
 window.open('whatsapp://send?text='+encodeURIComponent(text),'_blank')
 statusEl.textContent='WhatsApp aberto. Anexe os arquivos manualmente.'
 statusEl.className='err'

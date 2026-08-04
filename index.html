@@ -95,6 +95,31 @@ header.topbar{padding-top:calc(18px + env(safe-area-inset-top))}
 main{padding:12px}
 .card{padding:14px}
 }
+
+/* ---------- Histórico ---------- */
+.histo-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.08);cursor:pointer;border:1px solid transparent;transition:border-color .15s}
+.histo-card:active{border-color:#29B6C5}
+.histo-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.histo-icon{width:40px;height:40px;border-radius:10px;background:rgba(41,182,197,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.histo-info{flex:1;min-width:0}
+.histo-tipo{font-size:15px;font-weight:800}
+.histo-data{font-size:12px;color:#6b7679}
+.histo-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.histo-tag{font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;background:#f0f2f3;color:#4A5C60}
+.histo-cargas{font-size:12px;color:#6b7679}
+.histo-empty{text-align:center;padding:32px 16px;color:#6b7679;font-size:14px}
+.histo-empty-icon{font-size:32px;margin-bottom:8px;opacity:.4}
+.histo-detail{display:none;margin-top:12px;padding-top:10px;border-top:1px solid #eceeee}
+.histo-card.expanded .histo-detail{display:block}
+.histo-detail-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.histo-detail-label{font-weight:700;color:#6b7679}
+.histo-detail-val{font-weight:800}
+.histo-carga-block{background:#f7f8f8;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.histo-carga-title{font-size:12px;font-weight:800;color:#29B6C5;margin-bottom:6px}
+.histo-actions{display:flex;gap:8px;margin-top:10px}
+.histo-btn{flex:1;padding:8px;border-radius:8px;border:1px solid #c7ced0;background:#fff;font-size:12px;font-weight:700;cursor:pointer;color:#4A5C60;text-align:center}
+.histo-btn.primary{background:#29B6C5;color:#fff;border-color:#29B6C5}
+.histo-btn.danger{color:#C5221F;border-color:#f0b7b3}
 </style>
 <body>
 
@@ -649,6 +674,91 @@ cancelMotoristaEdit()
 renderMotoristas()
 })
 renderMotoristas()
+
+/* ================= HISTÓRICO ================= */
+function getHistorico(){
+try{return JSON.parse(localStorage.getItem('nagumoHistorico')||'[]')}catch(e){return[]}
+}
+function saveHistoricoArr(arr){
+localStorage.setItem('nagumoHistorico',JSON.stringify(arr))
+}
+function renderHistorico(){
+const list=document.getElementById('historicoList')
+const arr=getHistorico()
+list.innerHTML=''
+if(arr.length===0){
+list.innerHTML='<div class="histo-empty"><div class="histo-empty-icon">🕘</div>Nenhum carregamento registrado ainda.<br><small>Envie um checklist para vê-lo aqui.</small></div>'
+return
+}
+arr.forEach(function(h){
+const card=document.createElement('div')
+card.className='histo-card'
+const cargasText=h.cargas.length===1?'1 carga':h.cargas.length+' cargas'
+const midiasTotal=h.cargas.reduce(function(s,c){return s+(c.midias||0)},0)
+var html=
+'<div class="histo-head">'+
+'<div class="histo-icon">'+h.titulo.charAt(0)+'</div>'+
+'<div class="histo-info">'+
+'<div class="histo-tipo">'+escapeHtml(h.titulo)+'</div>'+
+'<div class="histo-data">'+escapeHtml(h.data)+'</div>'+
+'</div>'+
+'</div>'+
+'<div class="histo-meta">'+
+'<span class="histo-tag">👤 '+escapeHtml(h.conferente)+'</span>'+
+'<span class="histo-tag">🚙 '+escapeHtml(h.placa)+'</span>'+
+'<span class="histo-tag">👤 '+escapeHtml(h.motorista)+'</span>'+
+'</div>'+
+'<div class="histo-cargas">'+cargasText+' · '+midiasTotal+' mídia(s)</div>'+
+'<div class="histo-detail">'
+h.cargas.forEach(function(c,i){
+html+='<div class="histo-carga-block">'+
+'<div class="histo-carga-title">'+(i===0?'Carga':'Complemento '+(i))+'</div>'+
+'<div class="histo-detail-row"><span class="histo-detail-label">Loja</span><span class="histo-detail-val">'+escapeHtml(c.loja)+'</span></div>'+
+'<div class="histo-detail-row"><span class="histo-detail-label">Doca</span><span class="histo-detail-val">'+escapeHtml(c.doca)+'</span></div>'+
+'<div class="histo-detail-row"><span class="histo-detail-label">Paletes</span><span class="histo-detail-val">'+escapeHtml(c.paletes)+'</span></div>'+
+(c.rota?'<div class="histo-detail-row"><span class="histo-detail-label">Rota</span><span class="histo-detail-val">'+escapeHtml(c.rota)+'</span></div>':'')+
+'<div class="histo-detail-row"><span class="histo-detail-label">Mídias</span><span class="histo-detail-val">'+c.midias+'</span></div>'+
+'</div>'
+})
+html+=
+'<div class="histo-actions">'+
+'<button class="histo-btn primary" data-act="copy" data-id="'+h.id+'">📋 Copiar</button>'+
+'<button class="histo-btn primary" data-act="resend" data-id="'+h.id+'">📤 Reenviar</button>'+
+'<button class="histo-btn danger" data-act="del" data-id="'+h.id+'">🗑️</button>'+
+'</div>'+
+'</div>'
+card.innerHTML=html
+card.addEventListener('click',function(e){
+if(e.target.closest('.histo-btn'))return
+card.classList.toggle('expanded')
+})
+card.querySelector('[data-act="copy"]').addEventListener('click',function(e){
+e.stopPropagation()
+if(navigator.clipboard){navigator.clipboard.writeText(h.texto).then(function(){alert('Texto copiado!')})}
+else{var ta=document.createElement('textarea');ta.value=h.texto;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('Texto copiado!')}
+})
+card.querySelector('[data-act="resend"]').addEventListener('click',function(e){
+e.stopPropagation()
+window.open('whatsapp://send?text='+encodeURIComponent(h.texto),'_blank')
+})
+card.querySelector('[data-act="del"]').addEventListener('click',function(e){
+e.stopPropagation()
+if(!confirm('Excluir este registro do histórico?'))return
+var fresh=getHistorico().filter(function(x){return x.id!==h.id})
+saveHistoricoArr(fresh)
+renderHistorico()
+})
+list.appendChild(card)
+})
+}
+renderHistorico()
+
+/* Atualiza histórico ao voltar para a aba */
+document.querySelectorAll('.tab').forEach(function(tab){
+tab.addEventListener('click',function(){
+if(tab.getAttribute('data-tab')==='tabHistorico')renderHistorico()
+})
+})
 </script>
 </body>
 </html>
