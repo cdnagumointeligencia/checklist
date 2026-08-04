@@ -208,6 +208,25 @@ lastAutoFillMotorista=''
 }
 })
 
+/* ================= DOCAS ================= */
+function normalizarLoja(s){
+const t=String(s).trim()
+if(/^\d+$/.test(t))return String(parseInt(t,10))
+return t.toLowerCase()
+}
+function getDocas(){
+try{return JSON.parse(localStorage.getItem('nagumoDocas')||'[]')}catch(e){return[]}
+}
+function docaPorLoja(loja){
+const n=normalizarLoja(loja)
+const docas=getDocas()
+for(let i=0;i<docas.length;i++){
+if(!docas[i].loja)continue
+if(normalizarLoja(docas[i].loja)===n)return docas[i].doca
+}
+return ''
+}
+
 function addBlock(){
 const block=document.createElement('div')
 block.className='card block required'
@@ -249,10 +268,24 @@ const videoBtn=block.querySelector('.btn-video')
 const photoInput=block.querySelector('.photoInput')
 const videoInput=block.querySelector('.videoInput')
 const rmBlock=block.querySelector('.rm-block')
+const storeInput=block.querySelector('.store')
+const dockInput=block.querySelector('.dock')
 const fields=block.querySelectorAll('.store,.dock,.pallets')
+let lastAutoFillDock=''
 
 fields.forEach(function(f){
 f.addEventListener('input',function(){f.classList.remove('invalid')})
+})
+
+storeInput.addEventListener('input',function(){
+const doca=docaPorLoja(storeInput.value)
+const cur=dockInput.value.trim()
+if(doca&&(cur===''||cur===lastAutoFillDock)){
+dockInput.value=doca
+lastAutoFillDock=doca
+}else if(!doca){
+lastAutoFillDock=''
+}
 })
 
 photoBtn.addEventListener('click',()=>photoInput.click())

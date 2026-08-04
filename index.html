@@ -272,6 +272,14 @@ main{padding:12px}
 </div>
 <span class="cc-arrow">›</span>
 </button>
+<button class="card checklist-card" id="btnOpenDocas" type="button">
+<div class="cc-icon">🚪</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Configuração</span>
+<span class="cc-title">Docas</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
 <button class="card checklist-card" id="btnOpenUsers" type="button">
 <div class="cc-icon">👤</div>
 <div class="cc-text">
@@ -311,6 +319,31 @@ main{padding:12px}
 <button class="btn" id="routeSaveBtn" type="button">➕ Adicionar rota</button>
 </div>
 <div class="route-list" id="routeList"></div>
+</div>
+</div>
+</div>
+
+<!-- ============ MODAL DOCAS ============ -->
+<div id="modalDocas" class="modal">
+<div class="modal-header">
+<div class="modal-head-text">
+<h2>Docas</h2>
+<span class="eyebrow">Configurações · Docas</span>
+</div>
+<button class="modal-close" type="button" data-close="modalDocas">✕</button>
+</div>
+<div class="modal-body">
+<p class="route-hint">Associe docas a lojas. Ao digitar o número da loja no CD2 Docas, a doca é preenchida automaticamente. Deixe a loja em branco para docas sem loja.</p>
+<button class="btn-sm" id="docaRestoreBtn" type="button" style="margin-bottom:12px">↩️ Restaurar lista padrão</button>
+<div class="card">
+<div class="route-form">
+<label>Doca</label>
+<input type="text" id="docaNum" placeholder="Ex: 52">
+<label>Loja (deixe vazio para doca sem loja)</label>
+<input type="text" id="docaLoja" placeholder="Ex: 14">
+<button class="btn" id="docaSaveBtn" type="button">➕ Adicionar doca</button>
+</div>
+<div class="route-list" id="docaList"></div>
 </div>
 </div>
 </div>
@@ -464,6 +497,7 @@ saveRotas(rotas)
 }
 }
 seedRotas()
+seedDocas()
 
 function currentUser(){
 const u=sessionStorage.getItem('nagumoAuthUser')
@@ -544,6 +578,10 @@ document.body.style.overflow=''
 document.getElementById('btnOpenRotas').addEventListener('click',function(){
 renderRotas()
 openModal('modalRotas')
+})
+document.getElementById('btnOpenDocas').addEventListener('click',function(){
+renderDocas()
+openModal('modalDocas')
 })
 document.getElementById('btnOpenUsers').addEventListener('click',function(){
 if(!isAdmin()){alert('Apenas o admin pode acessar esta seção.');return}
@@ -641,6 +679,130 @@ routeStores.value=''
 renderRotas()
 })
 renderRotas()
+
+/* ================= DOCAS (Configurações) ================= */
+function defaultDocas(){
+var base=Date.now()
+return [
+{id:base+1,doca:'52',loja:'14'},{id:base+2,doca:'53',loja:'15'},
+{id:base+3,doca:'54',loja:'37'},{id:base+4,doca:'55',loja:'3'},
+{id:base+5,doca:'56',loja:'29'},{id:base+6,doca:'57',loja:'59'},
+{id:base+7,doca:'58',loja:'48'},{id:base+8,doca:'59',loja:'18'},
+{id:base+9,doca:'60',loja:'43'},{id:base+10,doca:'61',loja:'20'},
+{id:base+11,doca:'62',loja:'39'},{id:base+12,doca:'63',loja:'12'},
+{id:base+13,doca:'64',loja:'54'},{id:base+14,doca:'65',loja:'27'},
+{id:base+15,doca:'66',loja:'46'},{id:base+16,doca:'67',loja:''},
+{id:base+17,doca:'68',loja:'22'},{id:base+18,doca:'69',loja:'45'},
+{id:base+19,doca:'70',loja:'13'},{id:base+20,doca:'71',loja:'47'},
+{id:base+21,doca:'72',loja:'24'},{id:base+22,doca:'73',loja:'49'},
+{id:base+23,doca:'74',loja:'10'},{id:base+24,doca:'75',loja:'9'},
+{id:base+25,doca:'76',loja:'55'},{id:base+26,doca:'77',loja:'41'},
+{id:base+27,doca:'78',loja:''},{id:base+28,doca:'79',loja:'36'},
+{id:base+29,doca:'80',loja:'53'},{id:base+30,doca:'81',loja:'31'},
+{id:base+31,doca:'82',loja:'4'},{id:base+32,doca:'83',loja:'21'},
+{id:base+33,doca:'84',loja:'44'},{id:base+34,doca:'85',loja:'7'},
+{id:base+35,doca:'86',loja:'51'},{id:base+36,doca:'87',loja:''},
+{id:base+37,doca:'88',loja:'8'},{id:base+38,doca:'89',loja:'11'},
+{id:base+39,doca:'90',loja:'23'},{id:base+40,doca:'91',loja:'17'},
+{id:base+41,doca:'92',loja:'1'},{id:base+42,doca:'93',loja:'26'},
+{id:base+43,doca:'94',loja:'57'},{id:base+44,doca:'95',loja:'30'},
+{id:base+45,doca:'96',loja:'58'},{id:base+46,doca:'97',loja:'60'},
+{id:base+47,doca:'98',loja:'50'},{id:base+48,doca:'99',loja:'38'},
+{id:base+49,doca:'100',loja:'40'},{id:base+50,doca:'101',loja:'2'},
+{id:base+51,doca:'102',loja:'25'},{id:base+52,doca:'103',loja:'28'},
+{id:base+53,doca:'104',loja:'6'},{id:base+54,doca:'105',loja:'16'},
+{id:base+55,doca:'106',loja:''},{id:base+56,doca:'40',loja:'32'},
+{id:base+57,doca:'41',loja:'33'},{id:base+58,doca:'42',loja:'34'},
+{id:base+59,doca:'43',loja:'35'},{id:base+60,doca:'44',loja:'56'},
+{id:base+61,doca:'45',loja:'19'},{id:base+62,doca:'46',loja:'52'},
+{id:base+63,doca:'47',loja:'61'},{id:base+64,doca:'48',loja:'501'}
+]
+}
+function getDocas(){
+try{return JSON.parse(localStorage.getItem('nagumoDocas')||'[]')}catch(e){return[]}
+}
+function saveDocas(list){
+localStorage.setItem('nagumoDocas',JSON.stringify(list))
+}
+function seedDocas(){
+if(getDocas().length===0)saveDocas(defaultDocas())
+}
+const docaNum=document.getElementById('docaNum')
+const docaLoja=document.getElementById('docaLoja')
+const docaSaveBtn=document.getElementById('docaSaveBtn')
+const docaList=document.getElementById('docaList')
+let editingDocaId=null
+
+function renderDocas(){
+const list=getDocas().slice().sort(function(a,b){return (parseInt(a.doca,10)||0)-(parseInt(b.doca,10)||0)})
+docaList.innerHTML=''
+if(list.length===0){
+docaList.innerHTML='<p class="route-stores" style="padding:8px 0">Nenhuma doca cadastrada.</p>'
+return
+}
+list.forEach(function(d){
+const item=document.createElement('div')
+item.className='route-item'
+item.innerHTML=
+'<div class="route-info">'+
+'<div class="route-name">🚪 Doca '+escapeHtml(d.doca)+'</div>'+
+'<div class="route-stores">Loja: '+(d.loja?escapeHtml(d.loja):'Sem loja')+'</div>'+
+'</div>'+
+'<div class="route-actions">'+
+'<button class="btn-sm" type="button" data-act="edit">✏️</button>'+
+'<button class="btn-sm danger" type="button" data-act="del">🗑️</button>'+
+'</div>'
+item.querySelector('[data-act="edit"]').addEventListener('click',function(){
+editingDocaId=d.id
+docaNum.value=d.doca
+docaLoja.value=d.loja||''
+docaSaveBtn.textContent='💾 Atualizar doca'
+docaNum.focus()
+})
+item.querySelector('[data-act="del"]').addEventListener('click',function(){
+if(!confirm('Excluir a doca '+d.doca+'?'))return
+saveDocas(getDocas().filter(function(x){return x.id!==d.id}))
+if(editingDocaId===d.id)cancelDocaEdit()
+renderDocas()
+})
+docaList.appendChild(item)
+})
+}
+function cancelDocaEdit(){
+editingDocaId=null
+docaNum.value=''
+docaLoja.value=''
+docaSaveBtn.textContent='➕ Adicionar doca'
+}
+function docaExiste(doca,ignoreId){
+const n=String(doca).trim()
+return getDocas().some(function(d){return String(d.doca).trim()===n&&d.id!==ignoreId})
+}
+docaSaveBtn.addEventListener('click',function(){
+const doca=docaNum.value.trim()
+const loja=docaLoja.value.trim()
+if(!doca){alert('Informe o número da doca.');return}
+if(docaExiste(doca,editingDocaId)){alert('Esta doca já está cadastrada.');return}
+const list=getDocas()
+if(editingDocaId!==null){
+const idx=list.findIndex(function(d){return d.id===editingDocaId})
+if(idx>-1){list[idx].doca=doca;list[idx].loja=loja}
+editingDocaId=null
+docaSaveBtn.textContent='➕ Adicionar doca'
+}else{
+list.push({id:Date.now(),doca:doca,loja:loja})
+}
+saveDocas(list)
+cancelDocaEdit()
+renderDocas()
+})
+document.getElementById('docaRestoreBtn').addEventListener('click',function(){
+if(!confirm('Restaurar a lista padrão de docas? As alterações serão perdidas.'))return
+saveDocas(defaultDocas())
+cancelDocaEdit()
+renderDocas()
+})
+renderDocas()
 
 /* ================= USUÁRIOS (Configurações) ================= */
 const userLogin=document.getElementById('userLogin')
