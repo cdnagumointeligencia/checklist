@@ -349,6 +349,31 @@ saveUsers([{id:Date.now(),usuario:'admin',senha:hashSenha('admin'+':'+'admin123'
 }
 seedUsers()
 
+function seedRotas(){
+if(getRotas().length===0){
+var base=Date.now()
+var rotas=[
+{id:base+1,nome:'ABC',lojas:['01','26','38','50']},
+{id:base+2,nome:'Vale do Paraíba',lojas:['09','10','11','25','28','59']},
+{id:base+3,nome:'Atibaia',lojas:['31','32','33','34','35']},
+{id:base+4,nome:'Continental',lojas:['51','57']},
+{id:base+5,nome:'Miolo 1',lojas:['13','18','20','43']},
+{id:base+6,nome:'Miolo 2',lojas:['07','22','44','45']},
+{id:base+7,nome:'Cinturão 1',lojas:['02','19','40','52']},
+{id:base+8,nome:'Cinturão 2',lojas:['23','27','30','39','47']},
+{id:base+9,nome:'Zona Leste',lojas:['03','04','06','16','17','21','29']},
+{id:base+10,nome:'Guarulhos Cumbica',lojas:['14','15','37','42','61']},
+{id:base+11,nome:'Guarulhos Bonsucesso',lojas:['12','41','54','55','56']},
+{id:base+12,nome:'Guarulhos Juscelino',lojas:['08','24','49']},
+{id:base+13,nome:'Praia Grande',lojas:['58','60']},
+{id:base+14,nome:'Rio de Janeiro',lojas:['36','53']},
+{id:base+15,nome:'Lojas Terceiras',lojas:['46','48']}
+]
+saveRotas(rotas)
+}
+}
+seedRotas()
+
 function showLogin(){
 checklistView.classList.remove('active')
 loginView.classList.add('active')
