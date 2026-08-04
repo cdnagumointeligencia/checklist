@@ -21,11 +21,70 @@ header.topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height
 
 main{flex:1;padding:16px;max-width:520px;margin:0 auto;width:100%}
 
-.login-view{background:linear-gradient(160deg,#4A5C60 0%,#374649 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-.login-brand{text-align:center;color:#fff;margin-bottom:26px}
-.login-brand h1{font-size:24px;font-weight:800}
-.login-card{width:100%;max-width:380px;background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.08)}
-.login-error{color:#C5221F;font-size:13px;font-weight:700;min-height:18px;margin-bottom:4px}
+/* ---------- Premium Login (mobile-only screen) ---------- */
+.login-view{
+position:fixed;
+inset:0;
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+padding:28px 20px;
+overflow:hidden;
+background:
+radial-gradient(circle at 18% 10%, rgba(41,182,197,.32), transparent 42%),
+radial-gradient(circle at 85% 85%, rgba(41,182,197,.16), transparent 48%),
+linear-gradient(165deg,#2E3B3E 0%,#20292B 55%,#161D1F 100%);
+}
+.login-view::before,.login-view::after{
+content:'';position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;
+}
+.login-view::before{width:220px;height:220px;background:rgba(41,182,197,.30);top:-70px;left:-70px}
+.login-view::after{width:260px;height:260px;background:rgba(74,92,96,.40);bottom:-90px;right:-70px}
+
+.login-brand{position:relative;z-index:1;text-align:center;color:#fff;margin-bottom:28px}
+.login-badge{
+width:60px;height:60px;margin:0 auto 16px;border-radius:16px;
+background:linear-gradient(145deg,#29B6C5,#1C8A96);
+display:flex;align-items:center;justify-content:center;font-size:28px;
+box-shadow:0 10px 22px rgba(41,182,197,.35),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.login-brand h1{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.3}
+.login-brand .login-sub{display:block;margin-top:7px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+
+.login-card{
+position:relative;z-index:1;
+width:100%;max-width:380px;
+background:rgba(255,255,255,.98);
+border-radius:20px;
+padding:26px 22px 24px;
+box-shadow:0 22px 45px rgba(0,0,0,.30),0 2px 8px rgba(0,0,0,.12);
+border:1px solid rgba(255,255,255,.6);
+}
+
+.login-view .field-group{margin-bottom:16px}
+.login-view .input-wrap{position:relative}
+.login-view .field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.5;pointer-events:none}
+.login-view label{font-size:11px;font-weight:800;letter-spacing:.08em;color:#4A5C60;margin-bottom:7px}
+.login-view input[type="text"],.login-view input[type="password"]{
+padding:14px 14px 14px 40px;border-radius:12px;border:1.5px solid #e6e9ea;
+background:#F7F8F8;font-size:16px;margin-bottom:0;
+transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.login-view input[type="text"]:focus,.login-view input[type="password"]:focus{
+border-color:#29B6C5;background:#fff;box-shadow:0 0 0 4px rgba(41,182,197,.14);
+}
+
+.login-error{color:#C5221F;font-size:12.5px;font-weight:700;min-height:0;margin:0 0 4px}
+.login-error:not(:empty){display:flex;align-items:center;gap:6px;background:#FDECEA;padding:10px 12px;border-radius:10px;margin-bottom:14px}
+.login-error:not(:empty)::before{content:'⚠️';font-size:13px}
+
+.login-view .btn{
+margin-top:4px;padding:15px 16px;border-radius:13px;
+font-size:15px;font-weight:800;letter-spacing:.01em;
+background:linear-gradient(135deg,#29B6C5,#1FA0AE);
+box-shadow:0 8px 20px rgba(41,182,197,.35);
+}
+.login-view .btn:active{transform:scale(.98);box-shadow:0 4px 10px rgba(41,182,197,.3)}
+
+.login-footnote{position:relative;z-index:1;margin-top:22px;text-align:center;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.04em}
 
 label{display:block;font-size:12px;font-weight:700;color:#6b7679;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 input[type="text"],input[type="password"]{width:100%;padding:13px 14px;border:1.5px solid #e2e5e6;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px;background:#F0F0F0;color:#000}
@@ -82,8 +141,9 @@ header.topbar{padding-top:calc(18px + env(safe-area-inset-top))}
 
 /* ---------- Small screens ---------- */
 @media(max-width:380px){
-.login-brand h1{font-size:20px}
-.login-card{padding:18px}
+.login-badge{width:54px;height:54px;font-size:24px}
+.login-brand h1{font-size:17px}
+.login-card{padding:20px 16px 18px;border-radius:16px}
 .cc-title{font-size:14px}
 .cc-icon{width:40px;height:40px;font-size:18px}
 .tab{font-size:11px;padding:8px 4px}
@@ -94,6 +154,14 @@ header.topbar{padding-top:calc(18px + env(safe-area-inset-top))}
 .topbar-text h1{font-size:15px}
 main{padding:12px}
 .card{padding:14px}
+}
+@media(max-height:680px){
+.login-badge{width:48px;height:48px;font-size:22px;margin-bottom:10px}
+.login-brand{margin-bottom:18px}
+.login-brand h1{font-size:16px}
+.login-card{padding:18px 16px}
+.login-view .field-group{margin-bottom:12px}
+.login-footnote{margin-top:14px}
 }
 
 /* ---------- Histórico ---------- */
@@ -126,16 +194,29 @@ main{padding:12px}
 <!-- ============ LOGIN ============ -->
 <div id="loginView" class="login-view">
 <div class="login-brand">
+<div class="login-badge">🚚</div>
 <h1>Controle de Carregamento Nagumo</h1>
+<span class="login-sub">Acesso ao sistema</span>
 </div>
 <form id="loginForm" class="login-card" autocomplete="on">
+<div class="field-group">
 <label>Usuário</label>
-<input type="text" id="loginUser" autocomplete="username" placeholder="usuário">
+<div class="input-wrap">
+<span class="field-icon">👤</span>
+<input type="text" id="loginUser" autocomplete="username" placeholder="Digite seu usuário">
+</div>
+</div>
+<div class="field-group">
 <label>Senha</label>
-<input type="password" id="loginPass" autocomplete="current-password" placeholder="••••••">
+<div class="input-wrap">
+<span class="field-icon">🔒</span>
+<input type="password" id="loginPass" autocomplete="current-password" placeholder="Digite sua senha">
+</div>
+</div>
 <div id="loginError" class="login-error"></div>
 <button class="btn" type="submit">Entrar</button>
 </form>
+<div class="login-footnote">Nagumo · Sistema interno de logística</div>
 </div>
 
 <!-- ============ CHECKLIST ============ -->
@@ -344,10 +425,20 @@ localStorage.setItem('nagumoUsers',JSON.stringify(users))
 }
 function seedUsers(){
 if(getUsers().length===0){
-saveUsers([{id:Date.now(),usuario:'admin',senha:hashSenha('admin'+':'+'admin123')}])
+saveUsers([{id:Date.now(),usuario:'admin',senha:hashSenha('admin'+':'+'admin123'),role:'admin'}])
 }
+}
+function migrateUsers(){
+var users=getUsers()
+var changed=false
+users.forEach(function(u){
+if(u.usuario==='admin'&&!u.role){u.role='admin';changed=true}
+else if(!u.role){u.role='user';changed=true}
+})
+if(changed)saveUsers(users)
 }
 seedUsers()
+migrateUsers()
 
 function seedRotas(){
 if(getRotas().length===0){
@@ -374,6 +465,20 @@ saveRotas(rotas)
 }
 seedRotas()
 
+function currentUser(){
+const u=sessionStorage.getItem('nagumoAuthUser')
+if(!u)return null
+return getUsers().find(function(x){return x.usuario===u})||null
+}
+function isAdmin(){
+const cu=currentUser()
+return !!(cu&&cu.role==='admin')
+}
+function updateConfigVisibility(){
+const card=document.getElementById('btnOpenUsers')
+if(!card)return
+card.style.display=isAdmin()?'flex':'none'
+}
 function showLogin(){
 checklistView.classList.remove('active')
 loginView.classList.add('active')
@@ -388,6 +493,7 @@ topbarUser.textContent='👤 '+nome
 }else{
 topbarUser.style.display='none'
 }
+updateConfigVisibility()
 }
 
 loginForm.addEventListener('submit',function(e){
@@ -399,6 +505,7 @@ if(user&&user.senha===hashSenha(user.usuario+':'+p)){
 sessionStorage.setItem('nagumoAuth','1')
 sessionStorage.setItem('nagumoAuthNome',user.usuario)
 sessionStorage.setItem('nagumoAuthUser',user.usuario)
+sessionStorage.setItem('nagumoAuthRole',user.role||'user')
 loginError.textContent=''
 showChecklist()
 loginUser.value=''
@@ -412,6 +519,7 @@ loginPass.focus()
 
 logoutBtn.addEventListener('click',function(){
 sessionStorage.removeItem('nagumoAuth')
+sessionStorage.removeItem('nagumoAuthRole')
 showLogin()
 })
 
@@ -438,6 +546,7 @@ renderRotas()
 openModal('modalRotas')
 })
 document.getElementById('btnOpenUsers').addEventListener('click',function(){
+if(!isAdmin()){alert('Apenas o admin pode acessar esta seção.');return}
 renderUsers()
 openModal('modalUsers')
 })
@@ -550,14 +659,21 @@ return
 users.forEach(function(u){
 const item=document.createElement('div')
 item.className='route-item'
-item.innerHTML=
-'<div class="route-info">'+
-'<div class="route-name">👤 '+escapeHtml(u.usuario)+'</div>'+
-'</div>'+
-'<div class="route-actions">'+
+const isAdminUser=(u.role==='admin')
+var actions=''
+if(!isAdminUser){
+actions='<div class="route-actions">'+
 '<button class="btn-sm" type="button" data-act="edit">✏️</button>'+
 '<button class="btn-sm danger" type="button" data-act="del">🗑️</button>'+
 '</div>'
+}
+item.innerHTML=
+'<div class="route-info">'+
+'<div class="route-name">👤 '+escapeHtml(u.usuario)+(isAdminUser?' <span class="histo-tag" style="background:rgba(41,182,197,.12);color:#1C8A96">ADMIN</span>':'')+'</div>'+
+(isAdminUser?'<div class="route-stores">Conta protegida · senha não editável</div>':'')+
+'</div>'+
+actions
+if(!isAdminUser){
 item.querySelector('[data-act="edit"]').addEventListener('click',function(){
 editingUserId=u.id
 userLogin.value=u.usuario
@@ -573,6 +689,7 @@ saveUsers(getUsers().filter(function(x){return x.id!==u.id}))
 if(editingUserId===u.id)cancelUserEdit()
 renderUsers()
 })
+}
 userList.appendChild(item)
 })
 }
@@ -593,6 +710,8 @@ if(!usuario){alert('Informe o usuário (login).');return}
 if(userExists(usuario,editingUserId)){alert('Este usuário (login) já existe.');return}
 const users=getUsers()
 if(editingUserId!==null){
+const target=users.find(function(u){return u.id===editingUserId})
+if(target&&target.role==='admin'){alert('A conta do admin não pode ser alterada.');return}
 const idx=users.findIndex(function(u){return u.id===editingUserId})
 if(idx>-1){
 users[idx].usuario=usuario
@@ -602,7 +721,7 @@ editingUserId=null
 userSaveBtn.textContent='➕ Adicionar usuário'
 }else{
 if(!senha){alert('Informe a senha.');return}
-users.push({id:Date.now(),usuario:usuario,senha:hashSenha(usuario+':'+senha)})
+users.push({id:Date.now(),usuario:usuario,senha:hashSenha(usuario+':'+senha),role:'user'})
 }
 saveUsers(users)
 cancelUserEdit()
