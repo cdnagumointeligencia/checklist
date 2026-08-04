@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Registro de Prova</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--dark:#4A5C60;
+--teal:#29B6C5;
+--teal-soft:rgba(41,182,197,.12);
+--teal-soft-2:rgba(41,182,197,.22);
+--white:#FFFFFF;
+--bg:#F0F0F0;
+--ink:#000000;
+--danger:#C5221F;
+--danger-bg:#FDECEA;
+--ok:#137333;
+--ok-bg:#E6F4EA;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Roboto,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+
+/* ---------- Header ---------- */
+header.topbar{background:var(--dark);color:var(--white);padding:18px 20px 16px;display:flex;align-items:center;gap:12px;position:relative}
+header.topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--teal)}
+.topbar-icon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.topbar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.topbar-text h1{font-size:18px;font-weight:800;letter-spacing:.01em}
+.topbar-text .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);opacity:.95}
+
+main{flex:1;padding:16px 16px 8px;max-width:520px;margin:0 auto;width:100%}
+
+/* ---------- Section eyebrow ---------- */
+.section-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dark);opacity:.6;margin-bottom:10px}
+
+/* ---------- Generic card ---------- */
+.card{background:var(--white);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.08)}
+
+/* ---------- Loading block (cargo tag) ---------- */
+#blocksContainer{counter-reset:cargaCounter}
+.block{counter-increment:cargaCounter;position:relative;border:1px solid #eceeee}
+.block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tag-chip{display:flex;align-items:center;gap:9px}
+.tag-num{background:var(--dark);color:var(--white);min-width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.tag-num::before{content:counter(cargaCounter,decimal-leading-zero)}
+.tag-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dark)}
+.tag-label::after{content:'Carregamento CD1 FLV';font-weight:600;letter-spacing:0;text-transform:uppercase;color:#8a9598}
+.rm-block{background:none;border:none;color:var(--danger);font-size:12px;font-weight:700;letter-spacing:.02em;cursor:pointer;padding:6px 4px}
+.block-num{display:none}
+
+.block-divider{border-top:1px dashed #dde2e3;margin:0 -18px 14px}
+
+/* ---------- Fields ---------- */
+label{display:block;font-size:12px;font-weight:700;color:#6b7679;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.required label::after{content:' *';color:var(--danger)}
+.field-row{display:flex;gap:10px}
+.field-row .field{flex:1}
+input[type="text"],input[type="number"]{width:100%;padding:13px 14px;border:1.5px solid #e2e5e6;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px;background:var(--bg);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input[type="text"]:focus,input[type="number"]:focus{outline:none;border-color:var(--teal);background:var(--white);box-shadow:0 0 0 3px var(--teal-soft)}
+input[readonly]{color:#6b7679;background:#fafafa}
+.invalid{border-color:var(--danger)!important;background:var(--danger-bg)!important}
+
+/* ---------- Buttons ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 16px;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;width:100%;transition:opacity .15s,transform .1s}
+.btn:active{opacity:.82;transform:scale(.99)}
+.btn-teal{background:var(--teal);color:var(--white)}
+.btn-teal-soft{background:var(--teal-soft);color:var(--dark);border:1.5px solid var(--teal-soft-2)}
+.btn-outline{background:var(--white);color:var(--dark);border:1.5px dashed #c7ced0}
+.btn-ghost{background:none;color:#6b7679;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.btn-row{display:flex;gap:10px;margin-top:2px}
+.btn-row .btn{flex:1}
+input[type="file"]{display:none}
+
+/* ---------- Media previews ---------- */
+.previews{margin-top:14px;display:none;flex-wrap:wrap;gap:8px}
+.previews .thumb{position:relative;width:76px;height:76px;border-radius:10px;overflow:hidden;border:2px solid var(--bg);background:var(--ink)}
+.previews .thumb img,.previews .thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.previews .thumb .rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,.65);color:var(--white);border:none;border-radius:50%;width:20px;height:20px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* ---------- Signature ---------- */
+.sig-wrap{position:relative;border:2px dashed #c7ced0;border-radius:12px;overflow:hidden;background:var(--bg);touch-action:none;margin-bottom:12px;transition:border-color .15s}
+#sigCanvas{display:block;width:100%;height:190px;cursor:crosshair;background:var(--white)}
+.sig-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;color:#9aa4a6;font-size:14px;font-weight:600;pointer-events:none}
+.sig-wrap.signed{border-color:var(--teal);border-style:solid}
+.sig-wrap.signed .sig-placeholder{display:none}
+.sig-wrap.signed::after{content:'\2713';position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;background:var(--teal);color:var(--white);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+
+/* ---------- Vehicle inputs spacing fix ---------- */
+#placaInput{text-transform:uppercase}
+
+/* ---------- Footer action bar ---------- */
+.footer-spacer{height:8px}
+.footer-bar{position:sticky;bottom:0;left:0;right:0;background:var(--white);box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:5}
+.footer-bar-inner{max-width:520px;margin:0 auto}
+#status{margin-top:8px;font-size:13px;text-align:center;min-height:18px;font-weight:600}
+#status.ok{color:var(--ok)}
+#status.err{color:var(--danger)}
+
+.reset-row{text-align:center;padding:6px 0 22px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<div class="topbar-icon">🥬</div>
+<div class="topbar-text">
+<span class="eyebrow">CD1 · FLV</span>
+</div>
+</header>
+
+<main>
+<div id="blocksContainer"></div>
+
+<button class="btn btn-outline" id="addBlockBtn">➕ Adicionar Complemento</button>
+
+<div class="card" style="margin-top:14px">
+<div class="field-row">
+<div class="field">
+<label>Placa do veículo</label>
+<input type="text" id="placaInput" placeholder="ABC-1D23">
+</div>
+</div>
+<label>Nome do motorista</label>
+<input type="text" id="motoristaInput" placeholder="Ex: João da Silva" style="margin-bottom:0">
+</div>
+
+<div class="card">
+<div class="section-eyebrow">Assinatura digital</div>
+<div class="sig-wrap" id="sigWrap">
+<canvas id="sigCanvas" width="460" height="200"></canvas>
+<div class="sig-placeholder">✍️ Assine aqui</div>
+</div>
+<button class="btn btn-ghost" id="clearSigBtn" style="width:auto;margin:0 auto">🧹 Limpar assinatura</button>
+</div>
+
+<div class="reset-row">
+<button class="btn btn-ghost" id="resetBtn" style="width:auto">🔄 Recomeçar registro</button>
+</div>
+</main>
+
+<div class="footer-bar">
+<div class="footer-bar-inner">
+<button class="btn btn-teal" id="shareBtn">📤 Enviar Registro</button>
+<div id="status"></div>
+</div>
+</div>
+
+<script>
+const blocksContainer=document.getElementById('blocksContainer')
+const addBlockBtn=document.getElementById('addBlockBtn')
+const shareBtn=document.getElementById('shareBtn')
+const resetBtn=document.getElementById('resetBtn')
+const statusEl=document.getElementById('status')
+const placaInput=document.getElementById('placaInput')
+const motoristaInput=document.getElementById('motoristaInput')
+const sigCanvas=document.getElementById('sigCanvas')
+const sigWrap=document.getElementById('sigWrap')
+const clearSigBtn=document.getElementById('clearSigBtn')
+const sigCtx=sigCanvas.getContext('2d')
+let signed=false
+
+let lastAutoFillMotorista=''
+function getMotoristas(){
+try{return JSON.parse(localStorage.getItem('nagumoMotoristas')||'[]')}catch(e){return[]}
+}
+function normalizarPlaca(s){
+return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'')
+}
+function motoristaPorPlaca(placa){
+const n=normalizarPlaca(placa)
+const list=getMotoristas()
+for(let i=0;i<list.length;i++){
+if(normalizarPlaca(list[i].placa)===n)return list[i].nome
+}
+return ''
+}
+placaInput.addEventListener('input',function(){
+let v=placaInput.value.toUpperCase().replace(/[^A-Z0-9]/g,'')
+if(v.length>3)v=v.slice(0,3)+'-'+v.slice(3,7)
+placaInput.value=v
+const nome=motoristaPorPlaca(v)
+const cur=motoristaInput.value.trim()
+if(nome&&(cur===''||cur===lastAutoFillMotorista)){
+motoristaInput.value=nome
+lastAutoFillMotorista=nome
+}else if(!nome){
+lastAutoFillMotorista=''
+}
+})
+
+sigCtx.lineWidth=2.5
+sigCtx.lineCap='round'
+sigCtx.lineJoin='round'
+sigCtx.strokeStyle='#333'
+sigCtx.fillStyle='#fff'
+sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height)
+
+function markSigned(){
+signed=true
+sigWrap.classList.add('signed')
+}
+
+function clearSignature(){
+signed=false
+sigWrap.classList.remove('signed')
+sigCtx.fillStyle='#fff'
+sigCtx.fillRect(0,0,sigCanvas.width,sigCanvas.height)
+}
+
+let drawing=false
+let lastX=0,lastY=0
+
+function sigPos(e){
+const rect=sigCanvas.getBoundingClientRect()
+return{
+x:(e.clientX-rect.left)*(sigCanvas.width/rect.width),
+y:(e.clientY-rect.top)*(sigCanvas.height/rect.height)
+}
+}
+
+sigCanvas.addEventListener('pointerdown',function(e){
+const p=sigPos(e)
+lastX=p.x
+lastY=p.y
+drawing=true
+sigCtx.beginPath()
+sigCtx.moveTo(lastX,lastY)
+sigCanvas.setPointerCapture(e.pointerId)
+markSigned()
+})
+
+sigCanvas.addEventListener('pointermove',function(e){
+if(!drawing)return
+const p=sigPos(e)
+sigCtx.lineTo(p.x,p.y)
+sigCtx.stroke()
+lastX=p.x
+lastY=p.y
+})
+
+function stopDraw(){drawing=false}
+sigCanvas.addEventListener('pointerup',stopDraw)
+sigCanvas.addEventListener('pointercancel',stopDraw)
+sigCanvas.addEventListener('pointerleave',stopDraw)
+
+clearSigBtn.addEventListener('click',clearSignature)
+
+/* ================= ROTAS ================= */
+function normalizarLoja(s){
+const t=String(s).trim()
+if(/^\d+$/.test(t))return String(parseInt(t,10))
+return t.toLowerCase()
+}
+function getRotas(){
+try{return JSON.parse(localStorage.getItem('nagumoRotas')||'[]')}catch(e){return[]}
+}
+function rotaDeLoja(loja){
+const n=normalizarLoja(loja)
+const rotas=getRotas()
+for(let i=0;i<rotas.length;i++){
+if(rotas[i].lojas.some(function(l){return normalizarLoja(l)===n})){
+return rotas[i].nome
+}
+}
+return ''
+}
+
+function addBlock(){
+const block=document.createElement('div')
+block.className='card block required'
+block.files=[]
+block.innerHTML=
+'<div class="block-head">'+
+'<div class="tag-chip"><span class="tag-label"></span></div>'+
+'<button class="rm-block">🗑 Remover</button>'+
+'</div>'+
+'<span class="block-num"></span>'+
+'<div class="block-divider"></div>'+
+'<div class="field-row">'+
+'<div class="field">'+
+'<label>Número da loja</label>'+
+'<input type="text" class="store" placeholder="Ex: 1234">'+
+'</div>'+
+'<div class="field">'+
+'<label>Doca</label>'+
+'<input type="text" class="dock" placeholder="Ex: 5">'+
+'</div>'+
+'</div>'+
+'<label>Quantidade de paletes</label>'+
+'<input type="number" class="pallets" min="0" placeholder="Ex: 12">'+
+'<label>Rota</label>'+
+'<input type="text" class="rota" readonly placeholder="Preenchida automaticamente">'+
+'<div class="btn-row">'+
+'<button class="btn btn-teal-soft btn-photo">📷 Tirar Foto</button>'+
+'<button class="btn btn-teal-soft btn-video">🎥 Gravar Vídeo</button>'+
+'</div>'+
+'<input type="file" class="photoInput" accept="image/*" capture="environment">'+
+'<input type="file" class="videoInput" accept="video/*" capture="environment">'+
+'<div class="previews"></div>'
+blocksContainer.appendChild(block)
+wireBlock(block)
+renumber()
+}
+
+function wireBlock(block){
+const photoBtn=block.querySelector('.btn-photo')
+const videoBtn=block.querySelector('.btn-video')
+const photoInput=block.querySelector('.photoInput')
+const videoInput=block.querySelector('.videoInput')
+const rmBlock=block.querySelector('.rm-block')
+const storeInput=block.querySelector('.store')
+const rotaInput=block.querySelector('.rota')
+const fields=block.querySelectorAll('.store,.dock,.pallets')
+
+fields.forEach(function(f){
+f.addEventListener('input',function(){f.classList.remove('invalid')})
+})
+
+storeInput.addEventListener('input',function(){
+rotaInput.value=rotaDeLoja(storeInput.value)
+})
+
+photoBtn.addEventListener('click',()=>photoInput.click())
+videoBtn.addEventListener('click',()=>videoInput.click())
+
+photoInput.addEventListener('change',function(e){
+const file=e.target.files[0]
+if(!file)return
+addMedia(block,file,true)
+photoInput.value=''
+})
+
+videoInput.addEventListener('change',function(e){
+const file=e.target.files[0]
+if(!file)return
+addMedia(block,file,false)
+videoInput.value=''
+})
+
+rmBlock.addEventListener('click',function(){
+if(blocksContainer.querySelectorAll('.block').length<=1)return
+block.remove()
+renumber()
+})
+}
+
+function addMedia(block,file,isPhoto){
+block.files.push(file)
+const previews=block.querySelector('.previews')
+previews.style.display='flex'
+const thumb=document.createElement('div')
+thumb.className='thumb'
+const rm=document.createElement('button')
+rm.className='rm'
+rm.textContent='✕'
+rm.addEventListener('click',function(){
+const idx=block.files.indexOf(file)
+if(idx>-1)block.files.splice(idx,1)
+thumb.remove()
+if(block.files.length===0)previews.style.display='none'
+})
+if(isPhoto){
+const img=document.createElement('img')
+img.alt='Foto'
+const reader=new FileReader()
+reader.onload=function(ev){img.src=ev.target.result}
+reader.readAsDataURL(file)
+thumb.appendChild(img)
+}else{
+const video=document.createElement('video')
+video.muted=true
+video.playsInline=true
+video.src=URL.createObjectURL(file)
+thumb.appendChild(video)
+}
+thumb.appendChild(rm)
+previews.appendChild(thumb)
+}
+
+function renumber(){
+const blocks=blocksContainer.querySelectorAll('.block')
+blocks.forEach(function(b,i){
+b.querySelector('.block-num').textContent='Carregamento CD1 FLV'
+b.querySelector('.rm-block').style.visibility=(i===0)?'hidden':'visible'
+})
+}
+
+function validate(){
+const blocks=blocksContainer.querySelectorAll('.block')
+if(blocks.length===0){
+statusEl.textContent='Adicione pelo menos um bloco'
+statusEl.className='err'
+return false
+}
+let ok=true
+blocks.forEach(function(b,i){
+const num=(i+1)
+const store=b.querySelector('.store')
+const dock=b.querySelector('.dock')
+const pallets=b.querySelector('.pallets')
+if(!store.value.trim()){store.classList.add('invalid');ok=false}
+if(!dock.value.trim()){dock.classList.add('invalid');ok=false}
+if(pallets.value===''){pallets.classList.add('invalid');ok=false}
+if(b.files.length===0){
+statusEl.textContent='Tire uma foto ou grave um vídeo no complemento '+(num>1?num-1:num)
+statusEl.className='err'
+ok=false
+}
+})
+if(!ok)return false
+if(!signed){
+statusEl.textContent='Faça a assinatura digital'
+statusEl.className='err'
+return false
+}
+return true
+}
+
+function signatureFile(){
+return new Promise(function(resolve){
+sigCanvas.toBlob(function(blob){
+if(!blob){resolve(null);return}
+resolve(new File([blob],'assinatura.png',{type:'image/png'}))
+},'image/png')
+})
+}
+
+function buildText(){
+const div='━━━━━━━━━━━━━━━'
+const lines=['*🚚 REGISTRO DE PROVA*','_CD1 · FLV_','']
+blocksContainer.querySelectorAll('.block').forEach(function(b,i){
+const store=b.querySelector('.store').value.trim()
+const dock=b.querySelector('.dock').value.trim()
+const pallets=b.querySelector('.pallets').value.trim()
+const rota=b.querySelector('.rota').value.trim()
+lines.push(div)
+lines.push('*Carga '+String(i+1).padStart(2,'0')+'*')
+lines.push('📍 Loja: '+(store||'-'))
+lines.push('🚪 Doca: '+(dock||'-'))
+lines.push('📦 Paletes: '+(pallets||'-'))
+lines.push('🚩 Rota: '+(rota||'-'))
+lines.push('📎 '+b.files.length+' mídia(s) anexada(s)')
+})
+lines.push(div)
+lines.push('')
+const placa=placaInput.value.trim()
+const motorista=motoristaInput.value.trim()
+lines.push('*Dados do veículo*')
+lines.push('🚙 Placa: '+(placa||'-'))
+lines.push('👤 Motorista: '+(motorista||'-'))
+lines.push('')
+lines.push('✍️ Assinatura digital: incluída ✅')
+const enviadoPor=sessionStorage.getItem('nagumoAuthNome')||''
+if(enviadoPor)lines.push('👤 Enviado por: '+enviadoPor)
+return lines.join('\n')
+}
+
+shareBtn.addEventListener('click',async()=>{
+if(!validate())return
+statusEl.textContent='Enviando...'
+statusEl.className=''
+shareBtn.disabled=true
+
+const files=[]
+blocksContainer.querySelectorAll('.block').forEach(function(b){files.push.apply(files,b.files)})
+const sig=await signatureFile()
+if(sig)files.push(sig)
+const text=buildText()
+
+if(navigator.share){
+try{
+await navigator.share({title:'Registro de Prova',text:text,files:files})
+statusEl.textContent='✅ Enviado com sucesso!'
+statusEl.className='ok'
+shareBtn.disabled=false
+return
+}catch(err){
+shareBtn.disabled=false
+if(err.name==='AbortError'){
+statusEl.textContent='Cancelado'
+statusEl.className=''
+return
+}
+statusEl.textContent='Erro: '+err.message
+statusEl.className='err'
+}
+}
+
+window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank')
+statusEl.textContent='WhatsApp aberto. Anexe os arquivos manualmente.'
+statusEl.className='err'
+shareBtn.disabled=false
+})
+
+resetBtn.addEventListener('click',function(){
+blocksContainer.innerHTML=''
+clearSignature()
+placaInput.value=''
+motoristaInput.value=''
+statusEl.textContent=''
+statusEl.className=''
+addBlock()
+})
+
+addBlockBtn.addEventListener('click',addBlock)
+addBlock()
+</script>
+</body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Checklist Nagumo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:Roboto,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F0F0;color:#000;min-height:100vh;display:flex;flex-direction:column}
+#loginView,#checklistView{display:none}
+#loginView.active{display:flex}
+#checklistView.active{display:block}
+
+header.topbar{background:#4A5C60;color:#fff;padding:18px 20px 16px;display:flex;align-items:center;gap:12px;position:relative}
+header.topbar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#29B6C5}
+.topbar-icon{width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.topbar-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.topbar-text h1{font-size:18px;font-weight:800}
+.topbar-text .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#29B6C5}
+.topbar-logout{background:rgba(255,255,255,.12);border:none;color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer}
+
+main{flex:1;padding:16px;max-width:520px;margin:0 auto;width:100%}
+
+.login-view{background:linear-gradient(160deg,#4A5C60 0%,#374649 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.login-brand{text-align:center;color:#fff;margin-bottom:26px}
+.login-brand h1{font-size:24px;font-weight:800}
+.login-card{width:100%;max-width:380px;background:#fff;border-radius:14px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.08)}
+.login-error{color:#C5221F;font-size:13px;font-weight:700;min-height:18px;margin-bottom:4px}
+
+label{display:block;font-size:12px;font-weight:700;color:#6b7679;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+input[type="text"],input[type="password"]{width:100%;padding:13px 14px;border:1.5px solid #e2e5e6;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px;background:#F0F0F0;color:#000}
+input[type="text"]:focus,input[type="password"]:focus{outline:none;border-color:#29B6C5;background:#fff;box-shadow:0 0 0 3px rgba(41,182,197,.12)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 16px;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;width:100%;background:#29B6C5;color:#fff}
+.btn:active{opacity:.82}
+
+.section-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#4A5C60;opacity:.6;margin-bottom:10px}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.08)}
+.checklist-card{display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;padding:16px 18px;width:100%;border:1px solid transparent;font-family:inherit}
+.cc-icon{width:46px;height:46px;border-radius:12px;background:rgba(41,182,197,.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.cc-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.cc-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#4A5C60;opacity:.55}
+.cc-title{font-size:16px;font-weight:800}
+.cc-arrow{color:#29B6C5;font-size:22px;font-weight:700}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:#4A5C60;padding:6px 12px calc(6px + env(safe-area-inset-bottom));gap:4px;border-top:3px solid #29B6C5}
+.tab{flex:1;background:none;border:none;color:rgba(255,255,255,.7);padding:10px 6px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tab .tab-icon{font-size:18px;line-height:1}
+.tab.active{color:#29B6C5}
+.tabpanel{display:none}
+.tabpanel.active{display:block}
+main{padding-bottom:76px}
+
+.route-hint{font-size:13px;color:#6b7679;margin-bottom:14px}
+.route-list .route-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #eceeee}
+.route-item:last-child{border-bottom:none}
+.route-info{flex:1;min-width:0}
+.route-name{font-size:15px;font-weight:800}
+.route-stores{font-size:13px;color:#6b7679}
+.route-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-sm{background:none;border:1px solid #c7ced0;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#4A5C60}
+.btn-sm.danger{color:#C5221F;border-color:#f0b7b3}
+.topbar-user{background:rgba(255,255,255,.12);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:#F0F0F0;z-index:50;display:none;flex-direction:column}
+.modal.open{display:flex}
+.modal-header{background:#4A5C60;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;position:relative;flex-shrink:0}
+.modal-header::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#29B6C5}
+.modal-head-text{flex:1;min-width:0}
+.modal-head-text h2{font-size:16px;font-weight:800;color:#fff;margin:0}
+.modal-head-text .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#29B6C5}
+.modal-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:34px;height:34px;border-radius:9px;font-size:16px;cursor:pointer;flex-shrink:0}
+.modal-body{flex:1;overflow-y:auto;padding:16px;max-width:520px;width:100%;margin:0 auto}
+</style>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView" class="login-view">
+<div class="login-brand">
+<h1>Controle de Carregamento Nagumo</h1>
+</div>
+<form id="loginForm" class="login-card" autocomplete="on">
+<label>Usuário</label>
+<input type="text" id="loginUser" autocomplete="username" placeholder="usuário">
+<label>Senha</label>
+<input type="password" id="loginPass" autocomplete="current-password" placeholder="••••••">
+<div id="loginError" class="login-error"></div>
+<button class="btn" type="submit">Entrar</button>
+</form>
+</div>
+
+<!-- ============ CHECKLIST ============ -->
+<div id="checklistView">
+<header class="topbar">
+<div class="topbar-icon">🧾</div>
+<div class="topbar-text">
+<h1>Checklist Nagumo</h1>
+<span class="eyebrow">Controle de Carregamento</span>
+</div>
+<span id="topbarUser" class="topbar-user" style="display:none"></span>
+<button id="logoutBtn" class="topbar-logout">Sair</button>
+</header>
+<main>
+<div class="tabpanel active" id="tabChecklist">
+<div class="section-eyebrow">Selecione o carregamento</div>
+<button class="card checklist-card" data-target="cd1.html">
+<div class="cc-icon">🧊</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Carregamento</span>
+<span class="cc-title">CD1 Perecíveis</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+<button class="card checklist-card" data-target="cd1-flv.html">
+<div class="cc-icon">🥬</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Carregamento</span>
+<span class="cc-title">CD1 FLV</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+<button class="card checklist-card" data-target="index1.html">
+<div class="cc-icon">🚚</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Carregamento</span>
+<span class="cc-title">CD2 Docas</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+</div>
+<div class="tabpanel" id="tabHistorico">
+<div class="section-eyebrow">Registro dos carregamentos enviados</div>
+<div id="historicoList"></div>
+</div>
+<div class="tabpanel" id="tabConfig">
+<div class="section-eyebrow">Configurações do sistema</div>
+<button class="card checklist-card" id="btnOpenRotas" type="button">
+<div class="cc-icon">🚩</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Configuração</span>
+<span class="cc-title">Rotas</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+<button class="card checklist-card" id="btnOpenUsers" type="button">
+<div class="cc-icon">👤</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Acesso</span>
+<span class="cc-title">Usuários</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+<button class="card checklist-card" id="btnOpenMotoristas" type="button">
+<div class="cc-icon">🚛</div>
+<div class="cc-text">
+<span class="cc-eyebrow">Cadastro</span>
+<span class="cc-title">Motoristas</span>
+</div>
+<span class="cc-arrow">›</span>
+</button>
+</div>
+</main>
+
+<!-- ============ MODAL ROTAS ============ -->
+<div id="modalRotas" class="modal">
+<div class="modal-header">
+<div class="modal-head-text">
+<h2>Rotas</h2>
+<span class="eyebrow">Configurações · Rotas</span>
+</div>
+<button class="modal-close" type="button" data-close="modalRotas">✕</button>
+</div>
+<div class="modal-body">
+<p class="route-hint">Associe lojas a rotas. Ex: lojas 8, 10, 12 → rota Guarulhos. Usado no preenchimento automático do CD1 Perecíveis.</p>
+<div class="card">
+<div class="route-form">
+<label>Nome da rota</label>
+<input type="text" id="routeName" placeholder="Ex: Guarulhos">
+<label>Lojas (separadas por vírgula)</label>
+<input type="text" id="routeStores" placeholder="Ex: 8, 10, 12">
+<button class="btn" id="routeSaveBtn" type="button">➕ Adicionar rota</button>
+</div>
+<div class="route-list" id="routeList"></div>
+</div>
+</div>
+</div>
+
+<!-- ============ MODAL USUÁRIOS ============ -->
+<div id="modalUsers" class="modal">
+<div class="modal-header">
+<div class="modal-head-text">
+<h2>Usuários</h2>
+<span class="eyebrow">Configurações · Acesso</span>
+</div>
+<button class="modal-close" type="button" data-close="modalUsers">✕</button>
+</div>
+<div class="modal-body">
+<p class="route-hint">Crie e edite usuários e senhas para acesso à página. O login do usuário é marcado no envio do checklist.</p>
+<div class="card">
+<div class="route-form">
+<label>Usuário (login)</label>
+<input type="text" id="userLogin" placeholder="Ex: joao" autocomplete="off">
+<label>Senha</label>
+<input type="password" id="userPass" placeholder="••••••" autocomplete="new-password">
+<button class="btn" id="userSaveBtn" type="button">➕ Adicionar usuário</button>
+</div>
+<div class="route-list" id="userList"></div>
+</div>
+</div>
+</div>
+
+<!-- ============ MODAL MOTORISTAS ============ -->
+<div id="modalMotoristas" class="modal">
+<div class="modal-header">
+<div class="modal-head-text">
+<h2>Motoristas</h2>
+<span class="eyebrow">Configurações · Cadastro</span>
+</div>
+<button class="modal-close" type="button" data-close="modalMotoristas">✕</button>
+</div>
+<div class="modal-body">
+<p class="route-hint">Associe placas a motoristas. Ao digitar a placa nos checklists, o nome do motorista é preenchido automaticamente — e pode ser editado à vontade.</p>
+<div class="card">
+<div class="route-form">
+<label>Placa do veículo</label>
+<input type="text" id="motoristaPlaca" placeholder="ABC-1D23">
+<label>Nome do motorista</label>
+<input type="text" id="motoristaNome" placeholder="Ex: João da Silva">
+<button class="btn" id="motoristaSaveBtn" type="button">➕ Adicionar motorista</button>
+</div>
+<div class="route-list" id="motoristaList"></div>
+</div>
+</div>
+</div>
+
+<nav class="tabbar">
+<button class="tab active" data-tab="tabChecklist"><span class="tab-icon">📋</span>Checklist</button>
+<button class="tab" data-tab="tabHistorico"><span class="tab-icon">🕘</span>Histórico</button>
+<button class="tab" data-tab="tabConfig"><span class="tab-icon">⚙️</span>Configurações</button>
+</nav>
+</div>
+
+<script>
+const loginView=document.getElementById('loginView')
+const checklistView=document.getElementById('checklistView')
+const loginForm=document.getElementById('loginForm')
+const loginUser=document.getElementById('loginUser')
+const loginPass=document.getElementById('loginPass')
+const loginError=document.getElementById('loginError')
+const logoutBtn=document.getElementById('logoutBtn')
+const topbarUser=document.getElementById('topbarUser')
+
+/* ============ NAVEGAÇÃO ENTRE PÁGINAS ============ */
+document.querySelectorAll('.checklist-card').forEach(function(card){
+card.addEventListener('click',function(){
+const target=card.getAttribute('data-target')
+if(target)window.location.href=target
+})
+})
+
+/* ================= ARMAZENAMENTO SEGURO ================= */
+function lsGet(key){
+try{return localStorage.getItem(key)}catch(e){return null}
+}
+function lsSet(key,val){
+try{localStorage.setItem(key,val);return true}catch(e){return false}
+}
+function ssGet(key){
+try{return sessionStorage.getItem(key)}catch(e){return null}
+}
+function ssSet(key,val){
+try{sessionStorage.setItem(key,val);return true}catch(e){return false}
+}
+function ssDel(key){
+try{sessionStorage.removeItem(key)}catch(e){}
+}
+
+/* ================= USUÁRIOS / SENHAS ================= */
+function hashSenha(s){
+let h1=0xdeadbeef,h2=0x41c6ce57
+for(let i=0;i<s.length;i++){
+const ch=s.charCodeAt(i)
+h1=Math.imul(h1^ch,2654435761)
+h2=Math.imul(h2^ch,1597334677)
+}
+h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909)
+h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909)
+return (h2>>>0).toString(16).padStart(8,'0')+(h1>>>0).toString(16).padStart(8,'0')
+}
+function getUsers(){
+try{return JSON.parse(localStorage.getItem('nagumoUsers')||'[]')}catch(e){return[]}
+}
+function saveUsers(users){
+localStorage.setItem('nagumoUsers',JSON.stringify(users))
+}
+function seedUsers(){
+if(getUsers().length===0){
+saveUsers([{id:Date.now(),usuario:'admin',senha:hashSenha('admin'+':'+'admin123')}])
+}
+}
+seedUsers()
+
+function showLogin(){
+checklistView.classList.remove('active')
+loginView.classList.add('active')
+}
+function showChecklist(){
+loginView.classList.remove('active')
+checklistView.classList.add('active')
+const nome=sessionStorage.getItem('nagumoAuthNome')
+if(nome){
+topbarUser.style.display='inline'
+topbarUser.textContent='👤 '+nome
+}else{
+topbarUser.style.display='none'
+}
+}
+
+loginForm.addEventListener('submit',function(e){
+e.preventDefault()
+const u=loginUser.value.trim()
+const p=loginPass.value
+const user= getUsers().find(function(x){return x.usuario===u})
+if(user&&user.senha===hashSenha(user.usuario+':'+p)){
+sessionStorage.setItem('nagumoAuth','1')
+sessionStorage.setItem('nagumoAuthNome',user.usuario)
+sessionStorage.setItem('nagumoAuthUser',user.usuario)
+loginError.textContent=''
+showChecklist()
+loginUser.value=''
+loginPass.value=''
+}else{
+loginError.textContent='Usuário ou senha inválidos.'
+loginPass.value=''
+loginPass.focus()
+}
+})
+
+logoutBtn.addEventListener('click',function(){
+sessionStorage.removeItem('nagumoAuth')
+showLogin()
+})
+
+document.querySelectorAll('.tab').forEach(function(tab){
+tab.addEventListener('click',function(){
+document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')})
+document.querySelectorAll('.tabpanel').forEach(function(p){p.classList.remove('active')})
+tab.classList.add('active')
+document.getElementById(tab.getAttribute('data-tab')).classList.add('active')
+})
+})
+
+/* ================= MODAIS (Configurações) ================= */
+function openModal(id){
+document.getElementById(id).classList.add('open')
+document.body.style.overflow='hidden'
+}
+function closeModal(id){
+document.getElementById(id).classList.remove('open')
+document.body.style.overflow=''
+}
+document.getElementById('btnOpenRotas').addEventListener('click',function(){
+renderRotas()
+openModal('modalRotas')
+})
+document.getElementById('btnOpenUsers').addEventListener('click',function(){
+renderUsers()
+openModal('modalUsers')
+})
+document.getElementById('btnOpenMotoristas').addEventListener('click',function(){
+renderMotoristas()
+openModal('modalMotoristas')
+})
+document.querySelectorAll('.modal-close').forEach(function(btn){
+btn.addEventListener('click',function(){closeModal(btn.getAttribute('data-close'))})
+})
+
+if(sessionStorage.getItem('nagumoAuth')==='1')showChecklist()
+else showLogin()
+
+/* ================= ROTAS (Configurações) ================= */
+const routeName=document.getElementById('routeName')
+const routeStores=document.getElementById('routeStores')
+const routeSaveBtn=document.getElementById('routeSaveBtn')
+const routeList=document.getElementById('routeList')
+let editingRouteId=null
+
+function getRotas(){
+try{return JSON.parse(localStorage.getItem('nagumoRotas')||'[]')}catch(e){return[]}
+}
+function saveRotas(rotas){
+localStorage.setItem('nagumoRotas',JSON.stringify(rotas))
+}
+function escapeHtml(s){
+return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+function normalizarLojas(s){
+return s.split(/[,;\s]+/).filter(Boolean)
+}
+function renderRotas(){
+const rotas=getRotas()
+routeList.innerHTML=''
+if(rotas.length===0){
+routeList.innerHTML='<p class="route-stores" style="padding:8px 0">Nenhuma rota cadastrada ainda.</p>'
+return
+}
+rotas.forEach(function(r){
+const item=document.createElement('div')
+item.className='route-item'
+item.innerHTML=
+'<div class="route-info">'+
+'<div class="route-name">🚩 '+escapeHtml(r.nome)+'</div>'+
+'<div class="route-stores">Lojas: '+r.lojas.join(', ')+'</div>'+
+'</div>'+
+'<div class="route-actions">'+
+'<button class="btn-sm" type="button" data-act="edit">✏️</button>'+
+'<button class="btn-sm danger" type="button" data-act="del">🗑️</button>'+
+'</div>'
+item.querySelector('[data-act="edit"]').addEventListener('click',function(){
+editingRouteId=r.id
+routeName.value=r.nome
+routeStores.value=r.lojas.join(', ')
+routeSaveBtn.textContent='💾 Atualizar rota'
+routeName.focus()
+})
+item.querySelector('[data-act="del"]').addEventListener('click',function(){
+if(!confirm('Excluir a rota "'+r.nome+'"?'))return
+saveRotas(getRotas().filter(function(x){return x.id!==r.id}))
+if(editingRouteId===r.id)cancelRouteEdit()
+renderRotas()
+})
+routeList.appendChild(item)
+})
+}
+function cancelRouteEdit(){
+editingRouteId=null
+routeName.value=''
+routeStores.value=''
+routeSaveBtn.textContent='➕ Adicionar rota'
+}
+routeSaveBtn.addEventListener('click',function(){
+const nome=routeName.value.trim()
+const lojas=normalizarLojas(routeStores.value)
+if(!nome){alert('Informe o nome da rota.');return}
+if(lojas.length===0){alert('Informe ao menos uma loja.');return}
+const rotas=getRotas()
+if(editingRouteId!==null){
+const idx=rotas.findIndex(function(r){return r.id===editingRouteId})
+if(idx>-1){rotas[idx].nome=nome;rotas[idx].lojas=lojas}
+editingRouteId=null
+routeSaveBtn.textContent='➕ Adicionar rota'
+}else{
+rotas.push({id:Date.now(),nome:nome,lojas:lojas})
+}
+saveRotas(rotas)
+routeName.value=''
+routeStores.value=''
+renderRotas()
+})
+renderRotas()
+
+/* ================= USUÁRIOS (Configurações) ================= */
+const userLogin=document.getElementById('userLogin')
+const userPass=document.getElementById('userPass')
+const userSaveBtn=document.getElementById('userSaveBtn')
+const userList=document.getElementById('userList')
+let editingUserId=null
+
+function renderUsers(){
+const users=getUsers()
+userList.innerHTML=''
+if(users.length===0){
+userList.innerHTML='<p class="route-stores" style="padding:8px 0">Nenhum usuário cadastrado.</p>'
+return
+}
+users.forEach(function(u){
+const item=document.createElement('div')
+item.className='route-item'
+item.innerHTML=
+'<div class="route-info">'+
+'<div class="route-name">👤 '+escapeHtml(u.usuario)+'</div>'+
+'</div>'+
+'<div class="route-actions">'+
+'<button class="btn-sm" type="button" data-act="edit">✏️</button>'+
+'<button class="btn-sm danger" type="button" data-act="del">🗑️</button>'+
+'</div>'
+item.querySelector('[data-act="edit"]').addEventListener('click',function(){
+editingUserId=u.id
+userLogin.value=u.usuario
+userPass.value=''
+userPass.placeholder='deixe em branco para manter'
+userSaveBtn.textContent='💾 Atualizar usuário'
+userLogin.focus()
+})
+item.querySelector('[data-act="del"]').addEventListener('click',function(){
+if(users.length<=1){alert('Não é possível excluir o último usuário.');return}
+if(!confirm('Excluir o usuário "'+u.usuario+'"?'))return
+saveUsers(getUsers().filter(function(x){return x.id!==u.id}))
+if(editingUserId===u.id)cancelUserEdit()
+renderUsers()
+})
+userList.appendChild(item)
+})
+}
+function cancelUserEdit(){
+editingUserId=null
+userLogin.value=''
+userPass.value=''
+userPass.placeholder='••••••'
+userSaveBtn.textContent='➕ Adicionar usuário'
+}
+function userExists(usuario,ignoreId){
+return getUsers().some(function(u){return u.usuario===usuario&&u.id!==ignoreId})
+}
+userSaveBtn.addEventListener('click',function(){
+const usuario=userLogin.value.trim()
+const senha=userPass.value
+if(!usuario){alert('Informe o usuário (login).');return}
+if(userExists(usuario,editingUserId)){alert('Este usuário (login) já existe.');return}
+const users=getUsers()
+if(editingUserId!==null){
+const idx=users.findIndex(function(u){return u.id===editingUserId})
+if(idx>-1){
+users[idx].usuario=usuario
+if(senha)users[idx].senha=hashSenha(usuario+':'+senha)
+}
+editingUserId=null
+userSaveBtn.textContent='➕ Adicionar usuário'
+}else{
+if(!senha){alert('Informe a senha.');return}
+users.push({id:Date.now(),usuario:usuario,senha:hashSenha(usuario+':'+senha)})
+}
+saveUsers(users)
+cancelUserEdit()
+renderUsers()
+})
+renderUsers()
+
+/* ================= MOTORISTAS (Configurações) ================= */
+const motoristaPlaca=document.getElementById('motoristaPlaca')
+const motoristaNome=document.getElementById('motoristaNome')
+const motoristaSaveBtn=document.getElementById('motoristaSaveBtn')
+const motoristaList=document.getElementById('motoristaList')
+let editingMotoristaId=null
+
+function normalizarPlaca(s){
+return String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'')
+}
+function formatPlaca(v){
+v=normalizarPlaca(v)
+if(v.length>3)v=v.slice(0,3)+'-'+v.slice(3,7)
+return v
+}
+motoristaPlaca.addEventListener('input',function(){
+motoristaPlaca.value=formatPlaca(motoristaPlaca.value)
+})
+function getMotoristas(){
+try{return JSON.parse(localStorage.getItem('nagumoMotoristas')||'[]')}catch(e){return[]}
+}
+function saveMotoristas(list){
+localStorage.setItem('nagumoMotoristas',JSON.stringify(list))
+}
+function renderMotoristas(){
+const list=getMotoristas()
+motoristaList.innerHTML=''
+if(list.length===0){
+motoristaList.innerHTML='<p class="route-stores" style="padding:8px 0">Nenhum motorista cadastrado.</p>'
+return
+}
+list.forEach(function(m){
+const item=document.createElement('div')
+item.className='route-item'
+item.innerHTML=
+'<div class="route-info">'+
+'<div class="route-name">🚛 '+escapeHtml(m.nome)+'</div>'+
+'<div class="route-stores">Placa: '+escapeHtml(m.placa)+'</div>'+
+'</div>'+
+'<div class="route-actions">'+
+'<button class="btn-sm" type="button" data-act="edit">✏️</button>'+
+'<button class="btn-sm danger" type="button" data-act="del">🗑️</button>'+
+'</div>'
+item.querySelector('[data-act="edit"]').addEventListener('click',function(){
+editingMotoristaId=m.id
+motoristaPlaca.value=m.placa
+motoristaNome.value=m.nome
+motoristaSaveBtn.textContent='💾 Atualizar motorista'
+motoristaNome.focus()
+})
+item.querySelector('[data-act="del"]').addEventListener('click',function(){
+if(!confirm('Excluir o motorista "'+m.nome+'"?'))return
+saveMotoristas(getMotoristas().filter(function(x){return x.id!==m.id}))
+if(editingMotoristaId===m.id)cancelMotoristaEdit()
+renderMotoristas()
+})
+motoristaList.appendChild(item)
+})
+}
+function cancelMotoristaEdit(){
+editingMotoristaId=null
+motoristaPlaca.value=''
+motoristaNome.value=''
+motoristaSaveBtn.textContent='➕ Adicionar motorista'
+}
+function placaExiste(placa,ignoreId){
+const n=normalizarPlaca(placa)
+return getMotoristas().some(function(m){return normalizarPlaca(m.placa)===n&&m.id!==ignoreId})
+}
+motoristaSaveBtn.addEventListener('click',function(){
+const placa=formatPlaca(motoristaPlaca.value)
+const nome=motoristaNome.value.trim()
+if(normalizarPlaca(placa).length<7){alert('Informe uma placa válida (ex: ABC-1D23).');return}
+if(!nome){alert('Informe o nome do motorista.');return}
+if(placaExiste(placa,editingMotoristaId)){alert('Esta placa já está cadastrada.');return}
+const list=getMotoristas()
+if(editingMotoristaId!==null){
+const idx=list.findIndex(function(m){return m.id===editingMotoristaId})
+if(idx>-1){list[idx].placa=placa;list[idx].nome=nome}
+editingMotoristaId=null
+motoristaSaveBtn.textContent='➕ Adicionar motorista'
+}else{
+list.push({id:Date.now(),placa:placa,nome:nome})
+}
+saveMotoristas(list)
+cancelMotoristaEdit()
+renderMotoristas()
+})
+renderMotoristas()
+</script>
+</body>
+</html>
