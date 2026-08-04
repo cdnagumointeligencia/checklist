@@ -47,7 +47,7 @@ main{flex:1;padding:16px 16px 8px;max-width:520px;margin:0 auto;width:100%}
 .tag-num{background:var(--dark);color:var(--white);min-width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
 .tag-num::before{content:counter(cargaCounter,decimal-leading-zero)}
 .tag-label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dark)}
-.tag-label::after{content:'Carregamento CD1 FLV';font-weight:600;letter-spacing:0;text-transform:uppercase;color:#8a9598}
+.tag-label::after{content:'Carregamento CD2 DOCAS';font-weight:600;letter-spacing:0;text-transform:uppercase;color:#8a9598}
 .rm-block{background:none;border:none;color:var(--danger);font-size:12px;font-weight:700;letter-spacing:.02em;cursor:pointer;padding:6px 4px}
 .block-num{display:none}
 
@@ -60,7 +60,6 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7679;text-transform:
 .field-row .field{flex:1}
 input[type="text"],input[type="number"]{width:100%;padding:13px 14px;border:1.5px solid #e2e5e6;border-radius:10px;font-size:15px;font-family:inherit;margin-bottom:14px;background:var(--bg);color:var(--ink);transition:border-color .15s,box-shadow .15s}
 input[type="text"]:focus,input[type="number"]:focus{outline:none;border-color:var(--teal);background:var(--white);box-shadow:0 0 0 3px var(--teal-soft)}
-input[readonly]{color:#6b7679;background:#fafafa}
 .invalid{border-color:var(--danger)!important;background:var(--danger-bg)!important}
 
 /* ---------- Buttons ---------- */
@@ -107,9 +106,9 @@ input[type="file"]{display:none}
 <body>
 <header class="topbar">
 <a href="index.html" class="topbar-back">← Voltar</a>
-<div class="topbar-icon">🥬</div>
+<div class="topbar-icon">🚚</div>
 <div class="topbar-text">
-<span class="eyebrow">CD1 · FLV</span>
+<span class="eyebrow">CD2 · Carregamento</span>
 </div>
 </header>
 
@@ -250,26 +249,6 @@ sigCanvas.addEventListener('pointerleave',stopDraw)
 
 clearSigBtn.addEventListener('click',clearSignature)
 
-/* ================= ROTAS ================= */
-function normalizarLoja(s){
-const t=String(s).trim()
-if(/^\d+$/.test(t))return String(parseInt(t,10))
-return t.toLowerCase()
-}
-function getRotas(){
-try{return JSON.parse(localStorage.getItem('nagumoRotas')||'[]')}catch(e){return[]}
-}
-function rotaDeLoja(loja){
-const n=normalizarLoja(loja)
-const rotas=getRotas()
-for(let i=0;i<rotas.length;i++){
-if(rotas[i].lojas.some(function(l){return normalizarLoja(l)===n})){
-return rotas[i].nome
-}
-}
-return ''
-}
-
 function addBlock(){
 const block=document.createElement('div')
 block.className='card block required'
@@ -293,8 +272,6 @@ block.innerHTML=
 '</div>'+
 '<label>Quantidade de paletes</label>'+
 '<input type="number" class="pallets" min="0" placeholder="Ex: 12">'+
-'<label>Rota</label>'+
-'<input type="text" class="rota" readonly placeholder="Preenchida automaticamente">'+
 '<div class="btn-row">'+
 '<button class="btn btn-teal-soft btn-photo">📷 Tirar Foto</button>'+
 '<button class="btn btn-teal-soft btn-video">🎥 Gravar Vídeo</button>'+
@@ -313,16 +290,10 @@ const videoBtn=block.querySelector('.btn-video')
 const photoInput=block.querySelector('.photoInput')
 const videoInput=block.querySelector('.videoInput')
 const rmBlock=block.querySelector('.rm-block')
-const storeInput=block.querySelector('.store')
-const rotaInput=block.querySelector('.rota')
 const fields=block.querySelectorAll('.store,.dock,.pallets')
 
 fields.forEach(function(f){
 f.addEventListener('input',function(){f.classList.remove('invalid')})
-})
-
-storeInput.addEventListener('input',function(){
-rotaInput.value=rotaDeLoja(storeInput.value)
 })
 
 photoBtn.addEventListener('click',()=>photoInput.click())
@@ -385,7 +356,7 @@ previews.appendChild(thumb)
 function renumber(){
 const blocks=blocksContainer.querySelectorAll('.block')
 blocks.forEach(function(b,i){
-b.querySelector('.block-num').textContent='Carregamento CD1 FLV'
+b.querySelector('.block-num').textContent='Carregamento CD2 DOCAS'
 b.querySelector('.rm-block').style.visibility=(i===0)?'hidden':'visible'
 })
 }
@@ -432,18 +403,16 @@ resolve(new File([blob],'assinatura.png',{type:'image/png'}))
 
 function buildText(){
 const div='━━━━━━━━━━━━━━━'
-const lines=['*🚚 REGISTRO DE PROVA*','_CD1 · FLV_','']
+const lines=['*🚚 REGISTRO DE PROVA*','_CD2 · Carregamento_','']
 blocksContainer.querySelectorAll('.block').forEach(function(b,i){
 const store=b.querySelector('.store').value.trim()
 const dock=b.querySelector('.dock').value.trim()
 const pallets=b.querySelector('.pallets').value.trim()
-const rota=b.querySelector('.rota').value.trim()
 lines.push(div)
 lines.push('*Carga '+String(i+1).padStart(2,'0')+'*')
 lines.push('📍 Loja: '+(store||'-'))
 lines.push('🚪 Doca: '+(dock||'-'))
 lines.push('📦 Paletes: '+(pallets||'-'))
-lines.push('🚩 Rota: '+(rota||'-'))
 lines.push('📎 '+b.files.length+' mídia(s) anexada(s)')
 })
 lines.push(div)
